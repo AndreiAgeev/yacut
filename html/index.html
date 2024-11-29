@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}YaCut - укоротитель ссылок{% endblock title %}
 {% block content %}
   <main>
     <section class="container my-5 px-4">
@@ -25,10 +26,10 @@
                   {% endif %}
                 </div>
                 <div>
-                  {{ form.short_link(class="form-control form-control-lg py-2 mb-3", id="form-link",
-                    placeholder=form.short_link.label.text) }}
-                  {% if form.short_link.errors %}
-                    {% for error in form.short_link.errors %}
+                  {{ form.custom_id(class="form-control form-control-lg py-2 mb-3", id="form-link",
+                    placeholder=form.custom_id.label.text) }}
+                  {% if form.custom_id.errors %}
+                    {% for error in form.custom_id.errors %}
                       <p><span style="color:red">{{ error }}</span></p>
                     {% endfor %}
                   {% endif %}
@@ -41,19 +42,21 @@
           </div>
         </div>
       </div>
-      {% with messages = get_flashed_messages() %}
+
         <div class="container">
           <div class="row ">
             <div class="col-sm">
             </div>
             <div class="col-sm">
               <p class="text-center">
-              {% if messages %}
-                {% for message in messages %}
- 
-                  <h5 class="text-center">{{ message }}</h5>
-                {% endfor %}
-              {% endif %}
+              {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                  {% for message in messages %}
+  
+                    <h5 class="text-center">{{ message }}</h5>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
               {% if short %}
                 <h5 class="text-center">Ваша новая ссылка готова:</h5>
                 <h5 class="text-center"><a href="{{ short }}">{{ short }}</a></h5>
@@ -64,7 +67,7 @@
             </div>
           </div>
         </div>
-      {% endwith %}
+      
     </section>
   </main>
 {% endblock content %}

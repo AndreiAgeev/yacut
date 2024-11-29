@@ -1,4 +1,4 @@
-from flask import flash, redirect, render_template, request
+from flask import abort, flash, redirect, render_template, request
 
 from . import app, db
 from .forms import ShortLinkForm
@@ -10,27 +10,32 @@ from .utils import make_short_link
 def index_view():
     form = ShortLinkForm()
     if form.validate_on_submit():
-        short_link = form.short_link.data
+        custom_id = form.custom_id.data
         if (
-            short_link and
-            URLMap.query.filter_by(short=short_link).first()
+            custom_id and
+            URLMap.query.filter_by(short=custom_id).first()
         ):
             flash('Предложенный вариант короткой ссылки уже существует.')
             return render_template('index.html', form=form)
-        elif not short_link:
-            short_link = make_short_link()
+        elif not custom_id:
+            custom_id = make_short_link()
         urlmap = URLMap(
             original=form.original_link.data,
-            short=short_link
+            short=custom_id
         )
         db.session.add(urlmap)
         db.session.commit()
-        short_link = request.url + short_link
-        return render_template('index.html', form=form, short=short_link)
+        return render_template(
+            'index.html',
+            form=form,
+            short=request.host_url + custom_id
+        )
     return render_template('index.html', form=form)
 
 
-@app.route('/<string:short_link>')
-def short_link_redirect(short_link):
-    urlmap = URLMap.query.filter_by(short=short_link).first()
+@app.route('/<string:custom_id>')
+def short_link_redirect(custom_id):
+    urlmap = URLMap.query.filter_by(short=custom_id).first()
+    if urlmap is None:
+        abort(404)
     return redirect(urlmap.original)

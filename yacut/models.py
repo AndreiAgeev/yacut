@@ -1,6 +1,8 @@
 from datetime import datetime, timezone
 
-from yacut import db
+from sqlalchemy.orm import validates
+
+from . import db
 
 
 class URLMap(db.Model):
@@ -12,3 +14,21 @@ class URLMap(db.Model):
         index=True,
         default=datetime.now(timezone.utc)
     )
+
+    @validates('short')
+    def validate_short_link(self, key, short):
+        from .utils import validate_short
+        if validate_short(short):
+            raise ValueError('Указано недопустимое имя для параметра short')
+        return short
+
+    def from_dict(self, data):
+        for field in ['url', 'custom_id']:
+            if field in data:
+                setattr(self, field, data[field])
+
+    def to_dict(self, url):
+        return dict(
+            url=self.original,
+            short_link=url + self.short
+        )
