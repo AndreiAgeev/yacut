@@ -5,11 +5,13 @@ from .models import URLMap
 
 
 CHARSET = ascii_letters + digits
+SHORT_LINK_LENGTH = 16
+RANDOM_SHORT_LINK_LENGTH = 6
 
 
 def make_short_link():
     while True:
-        short_link = ''.join(choices(CHARSET, k=6))
+        short_link = ''.join(choices(CHARSET, k=RANDOM_SHORT_LINK_LENGTH))
         if not URLMap.query.filter_by(short=short_link).first():
             break
     return short_link

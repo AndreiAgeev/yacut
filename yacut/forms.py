@@ -4,7 +4,7 @@ from wtforms.validators import (
     DataRequired, Length, Optional, ValidationError, URL
 )
 
-from .utils import validate_short
+from .utils import SHORT_LINK_LENGTH, validate_short
 
 
 ERROR_MESSAGE = (
@@ -23,7 +23,7 @@ class ShortLinkForm(FlaskForm):
     )
     custom_id = StringField(
         'Ваш вариант короткой ссылки',
-        validators=(Length(1, 16), Optional())
+        validators=(Length(1, SHORT_LINK_LENGTH), Optional())
     )
     submit = SubmitField('Создать')
 

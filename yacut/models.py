@@ -17,8 +17,8 @@ class URLMap(db.Model):
 
     @validates('short')
     def validate_short_link(self, key, short):
-        from .utils import validate_short
-        if validate_short(short) or len(short) > 16:
+        from .utils import SHORT_LINK_LENGTH, validate_short
+        if validate_short(short) or len(short) > SHORT_LINK_LENGTH:
             raise ValueError('Указано недопустимое имя для параметра short')
         return short
 

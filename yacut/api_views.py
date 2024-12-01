@@ -1,9 +1,11 @@
+from http import HTTPStatus
+
 from flask import jsonify, request
 
 from . import app, db
 from .error_handlers import APIException
 from .models import URLMap
-from .utils import make_short_link, validate_short
+from .utils import SHORT_LINK_LENGTH, make_short_link, validate_short
 
 
 @app.route('/api/id/', methods=['POST'])
@@ -15,7 +17,7 @@ def create_short_link():
         raise APIException('"url" является обязательным полем!')
     if 'custom_id' in data and (
         validate_short(data['custom_id']) or
-        len(data['custom_id']) > 16
+        len(data['custom_id']) > SHORT_LINK_LENGTH
     ):
         raise APIException('Указано недопустимое имя для короткой ссылки')
     elif (
@@ -33,12 +35,12 @@ def create_short_link():
     )
     db.session.add(urlmap)
     db.session.commit()
-    return jsonify(urlmap.to_dict(request.host_url)), 201
+    return jsonify(urlmap.to_dict(request.host_url)), HTTPStatus.CREATED
 
 
 @app.route('/api/id/<string:short_link>/', methods=['GET'])
 def get_url(short_link):
     urlmap = URLMap.query.filter_by(short=short_link).first()
     if not urlmap:
-        raise APIException('Указанный id не найден', 404)
-    return jsonify({'url': urlmap.original}), 200
+        raise APIException('Указанный id не найден', HTTPStatus.NOT_FOUND)
+    return jsonify({'url': urlmap.original}), HTTPStatus.OK
